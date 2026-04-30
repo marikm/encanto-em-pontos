@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("api/cores")
 public class CorController {
@@ -18,7 +20,13 @@ public class CorController {
         this.corService = corService;
     }
 
-    @GetMapping("/{id}")
+    @GetMapping
+    public ResponseEntity<List<Cor>> listarCores() {
+        List<Cor> cores = corService.listarCores();
+        return ResponseEntity.ok().body(cores);
+    }
+
+    @GetMapping(value = "/{id}")
     public ResponseEntity<Cor> buscarCorPorId(@PathVariable Integer id) {
         // O Controller apenas chama o Service e espera o sucesso
         Cor corEncontrada = corService.buscarPorId(id);

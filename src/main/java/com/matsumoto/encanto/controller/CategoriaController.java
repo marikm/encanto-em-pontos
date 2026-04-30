@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(value = "/categorias")
 public class CategoriaController {
 
-    @GetMapping("/all")
+    @GetMapping
     public ResponseEntity<Categoria> findAll() {
         Categoria categoria = new Categoria(1, "blusas");
         return ResponseEntity.ok().body(categoria);
