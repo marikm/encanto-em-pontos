@@ -16,6 +16,19 @@ public class GlobalExceptionHandler {
         Map<String, Object> body = criarCorpoResposta(HttpStatus.NOT_FOUND, ex.getMessage());
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(CategoriaNaoEncontradaException.class)
+    public ResponseEntity<Object> handleCategoriaNaoEncontrada(CategoriaNaoEncontradaException ex) {
+        Map<String, Object> body = criarCorpoResposta(HttpStatus.NOT_FOUND, ex.getMessage());
+        return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(ProdutoNaoEncontradoException.class)
+    public ResponseEntity<Object> handleProdutoNaoEncontrado(ProdutoNaoEncontradoException ex) {
+        Map<String, Object> body = criarCorpoResposta(HttpStatus.NOT_FOUND, ex.getMessage());
+        return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+    }
+
     private Map<String, Object> criarCorpoResposta(HttpStatus status, String mensagem) {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now());
