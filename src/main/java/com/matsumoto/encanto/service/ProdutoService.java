@@ -5,12 +5,15 @@ import com.matsumoto.encanto.domain.Material;
 import com.matsumoto.encanto.domain.Produto;
 import com.matsumoto.encanto.dto.ProdutoRequest;
 import com.matsumoto.encanto.dto.ProdutoResponse;
+import com.matsumoto.encanto.exceptions.CategoriaNaoEncontradaException;
 import com.matsumoto.encanto.exceptions.ProdutoNaoEncontradoException;
 import com.matsumoto.encanto.repository.CategoriaRepository;
 import com.matsumoto.encanto.repository.MaterialRepository;
 import com.matsumoto.encanto.repository.ProdutoRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -30,10 +33,24 @@ public class ProdutoService {
     }
 
     public ProdutoResponse criar (ProdutoRequest request) {
+        Categoria categoria = categoriaRepository.findById(request.getCategoriaId()).orElseThrow(
+                () -> new CategoriaNaoEncontradaException("Categoria não encontrada! O ID " + request.getCategoriaId() + " não existe no catálogo do ateliê. "));
+        Set<Material> materiais = new HashSet<>(materialRepository.findAllById(request.getMateriaisIds()));
+        // Montar o Produto
+        Produto produto = new Produto();
+        produto.setNome(request.getNome());
+        produto.setDescricao(request.getDescricao());
+        produto.setFoto(request.getFoto());
+        produto.setCategoria(categoria);
+        produto.setMateriais(materiais);
 
+        Produto produtoSalvo = produtoRepository.save(produto);
+        return toResponse(produtoSalvo);
     }
-
-    public List<ProdutoResponse> listarTodos() {}
+    public List<ProdutoResponse> listarTodos() {
+        List<Produto> produtos = produtoRepository.findAll();
+        return produtos.stream().map(this::toResponse).collect(Collectors.toList());
+    }
 
     public ProdutoResponse buscarPorId(Integer id) {
         Produto produto = produtoRepository.findById(id)
@@ -41,9 +58,30 @@ public class ProdutoService {
         return toResponse(produto);
     }
 
-    public ProdutoResponse atualizar(Integer id, ProdutoRequest request) {}
+    public ProdutoResponse atualizar(Integer id, ProdutoRequest request) {
+        Produto produto = produtoRepository.findById(id)
+                .orElseThrow(() -> new ProdutoNaoEncontradoException("Produto não encontrado! O ID " + id + " não existe no catálogo do ateliê."));
+        Categoria categoria = categoriaRepository.findById(request.getCategoriaId()).orElseThrow(
+                () -> new CategoriaNaoEncontradaException("Categoria não encontrada! O ID " + request.getCategoriaId() + " não existe no catálogo do ateliê. "));
+        Set<Material> materiais = new HashSet<>(materialRepository.findAllById(request.getMateriaisIds()));
+        //
+        // Atualizando dados
+        //
+        produto.setNome(request.getNome());
+        produto.setDescricao(request.getDescricao());
+        produto.setCategoria(categoria);
+        produto.setMateriais(materiais);
+        produto.setFoto(request.getFoto());
+        Produto produtoSalvo = produtoRepository.save(produto);
 
-    public void deletar(Integer id) {}
+        return toResponse(produtoSalvo);
+    }
+
+    public void deletar(Integer id) {
+        Produto produto = produtoRepository.findById(id)
+                .orElseThrow(() -> new ProdutoNaoEncontradoException("Produto não encontrado! O ID " + id + " não existe no catálogo do ateliê."));
+        produtoRepository.delete(produto);
+    }
 
     private ProdutoResponse toResponse(Produto produto) {
         Integer id = produto.getId();
