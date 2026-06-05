@@ -35,7 +35,9 @@ public class ProdutoService {
     public ProdutoResponse criar (ProdutoRequest request) {
         Categoria categoria = categoriaRepository.findById(request.getCategoriaId()).orElseThrow(
                 () -> new CategoriaNaoEncontradaException("Categoria não encontrada! O ID " + request.getCategoriaId() + " não existe no catálogo do ateliê. "));
-        Set<Material> materiais = new HashSet<>(materialRepository.findAllById(request.getMateriaisIds()));
+        Set<Integer> ids = request.getMateriaisIds() != null ?
+                request.getMateriaisIds() : new HashSet<>();
+        Set<Material> materiais = new HashSet<>(materialRepository.findAllById(ids));
         // Montar o Produto
         Produto produto = new Produto();
         produto.setNome(request.getNome());
@@ -63,7 +65,9 @@ public class ProdutoService {
                 .orElseThrow(() -> new ProdutoNaoEncontradoException("Produto não encontrado! O ID " + id + " não existe no catálogo do ateliê."));
         Categoria categoria = categoriaRepository.findById(request.getCategoriaId()).orElseThrow(
                 () -> new CategoriaNaoEncontradaException("Categoria não encontrada! O ID " + request.getCategoriaId() + " não existe no catálogo do ateliê. "));
-        Set<Material> materiais = new HashSet<>(materialRepository.findAllById(request.getMateriaisIds()));
+        Set<Integer> ids = request.getMateriaisIds() != null ?
+                        request.getMateriaisIds() : new HashSet<>();
+        Set<Material> materiais = new HashSet<>(materialRepository.findAllById(ids));
         //
         // Atualizando dados
         //

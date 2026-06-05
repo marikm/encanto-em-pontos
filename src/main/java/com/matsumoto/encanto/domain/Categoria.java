@@ -15,8 +15,6 @@ import java.util.List;
 @Table(name = "categorias")
 public class Categoria {
     @EqualsAndHashCode.Include
-
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;

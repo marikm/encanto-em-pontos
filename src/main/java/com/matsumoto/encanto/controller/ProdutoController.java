@@ -3,6 +3,7 @@ package com.matsumoto.encanto.controller;
 import com.matsumoto.encanto.dto.ProdutoRequest;
 import com.matsumoto.encanto.dto.ProdutoResponse;
 import com.matsumoto.encanto.service.ProdutoService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +19,7 @@ public class ProdutoController {
     }
 
     @PostMapping
-    public ResponseEntity<ProdutoResponse> criar(@RequestBody ProdutoRequest produtoRequest) {
+    public ResponseEntity<ProdutoResponse> criar(@Valid @RequestBody ProdutoRequest produtoRequest) {
         ProdutoResponse produtoResponse = produtoService.criar(produtoRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(produtoResponse);
     }
