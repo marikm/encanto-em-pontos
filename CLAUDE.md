@@ -53,10 +53,10 @@ chore:    configure [dependency/environment]
 | `Categoria` | ✅ | ✅ | ❌ | ⚠️ stub hardcoded | — | ✅ `CategoriaNaoEncontradaException` |
 | `Material` | ✅ | ✅ | ❌ | ❌ | — | ❌ |
 | `Produto` | ✅ | ✅ | ✅ | ✅ POST · PUT · DELETE /api/produtos | ✅ Request/Response | ✅ `ProdutoNaoEncontradoException` |
-| `Variacao` | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| `Variacao` | ✅ | ✅ | ✅ | ✅ POST · PUT · DELETE /api/variacoes | ✅ Request/Response | ✅ `VariacaoNaoEncontradaException` |
 
 ### GlobalExceptionHandler
-Registrado: `CorNaoEncontradaException` · `ProdutoNaoEncontradoException` · `CategoriaNaoEncontradaException`
+Registrado: `CorNaoEncontradaException` · `ProdutoNaoEncontradoException` · `CategoriaNaoEncontradaException` · `VariacaoNaoEncontradaException`
 
 ### ProdutoService — métodos implementados
 - `criar` ✅ — busca Categoria + Materiais, monta Produto com setters, save retorna entidade com ID
@@ -70,6 +70,21 @@ Registrado: `CorNaoEncontradaException` · `ProdutoNaoEncontradoException` · `C
 - `PUT /api/produtos/{id}` → atualizar · retorna 200 OK
 - `DELETE /api/produtos/{id}` → deletar · retorna 204 No Content
 
+### VariacaoService — métodos implementados
+- `criar` ✅ — busca Produto + Cor, monta Variacao com setters, save retorna entidade com ID
+- `atualizar` ✅ — busca variação existente, busca Cor por corId, atualiza campos
+- `deletar` ✅ — busca antes de deletar para garantir que existe
+
+### VariacaoController — endpoints implementados
+- `POST /api/produtos/{id}/variacoes` → criar · retorna 201 Created
+- `PUT /api/variacoes/{id}` → atualizar · retorna 200 OK
+- `DELETE /api/variacoes/{id}` → deletar · retorna 204 No Content
+
+### Variacao — observações de domínio
+- `cor` é FK para a entidade `Cor` (`@ManyToOne`) — não texto livre
+- `VariacaoRequest` recebe `corId` (Integer) com `@NotNull`
+- `VariacaoResponse` expõe `cor` (String) com o nome da cor
+
 ---
 
 ## Ordem das features
@@ -78,7 +93,7 @@ Registrado: `CorNaoEncontradaException` · `ProdutoNaoEncontradoException` · `C
 | # | Feature | Status |
 |---|---------|--------|
 | F01 | Produto completo | ✅ concluída |
-| F02 | Variação do produto | ❌ |
+| F02 | Variação do produto | ✅ concluída |
 | F03 | Catálogo público (GET paginado) | ❌ |
 | F04 | Filtro de produtos (Specification) | ❌ |
 | F05 | Upload de imagens — Cloudinary | ❌ |
@@ -113,17 +128,10 @@ Registrado: `CorNaoEncontradaException` · `ProdutoNaoEncontradoException` · `C
 
 ## Próximo passo
 
-**F02 · Variação do produto** — arquivos a criar:
-- `Variacao` (entity)
-- `VariacaoRepository`
-- `VariacaoService`
-- `VariacaoController`
-- `VariacaoRequest` / `VariacaoResponse`
-- `VariacaoNaoEncontradaException`
+**F03 · Catálogo público de produtos** — sem autenticação · paginado · detalhe inclui variações
 
 Endpoints:
 ```
-POST   /api/produtos/{id}/variacoes  → adicionar variação (ADMIN)
-PUT    /api/variacoes/{id}           → editar (ADMIN)
-DELETE /api/variacoes/{id}           → remover (ADMIN)
+GET    /api/produtos          → listagem paginada (público)
+GET    /api/produtos/{id}     → detalhe com variações (público)
 ```
