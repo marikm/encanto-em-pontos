@@ -12,7 +12,6 @@ import lombok.*;
 @Table(name = "cores")
 public class Cor {
     @EqualsAndHashCode.Include
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
