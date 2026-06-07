@@ -19,7 +19,10 @@ public class Variacao {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    private String cor;
+    @NotNull
+    @ManyToOne
+    @JoinColumn(name = "cor_id")
+    private Cor cor;
     private String tamanho;
 
     @Positive

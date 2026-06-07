@@ -12,7 +12,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class VariacaoRequest {
-    private String cor;
+    @NotNull
+    private Integer corId;
     private String tamanho;
     @Positive
     private Double peso;
