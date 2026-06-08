@@ -3,16 +3,20 @@ package com.matsumoto.encanto.service;
 import com.matsumoto.encanto.domain.Categoria;
 import com.matsumoto.encanto.domain.Material;
 import com.matsumoto.encanto.domain.Produto;
+import com.matsumoto.encanto.domain.Variacao;
+import com.matsumoto.encanto.dto.ProdutoDetalheResponse;
 import com.matsumoto.encanto.dto.ProdutoRequest;
 import com.matsumoto.encanto.dto.ProdutoResponse;
+import com.matsumoto.encanto.dto.VariacaoResponse;
 import com.matsumoto.encanto.exceptions.CategoriaNaoEncontradaException;
 import com.matsumoto.encanto.exceptions.ProdutoNaoEncontradoException;
 import com.matsumoto.encanto.repository.CategoriaRepository;
 import com.matsumoto.encanto.repository.MaterialRepository;
 import com.matsumoto.encanto.repository.ProdutoRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -49,15 +53,15 @@ public class ProdutoService {
         Produto produtoSalvo = produtoRepository.save(produto);
         return toResponse(produtoSalvo);
     }
-    public List<ProdutoResponse> listarTodos() {
-        List<Produto> produtos = produtoRepository.findAll();
-        return produtos.stream().map(this::toResponse).collect(Collectors.toList());
+    public Page<ProdutoResponse> listarTodos(Pageable pageable) {
+        Page<Produto> produtos = produtoRepository.findAll(pageable);
+        return produtos.map(this::toResponse);
     }
 
-    public ProdutoResponse buscarPorId(Integer id) {
+    public ProdutoDetalheResponse buscarPorId(Integer id) {
         Produto produto = produtoRepository.findById(id)
                 .orElseThrow(() -> new ProdutoNaoEncontradoException("Produto não encontrado! O ID " + id + " não existe no catálogo do ateliê."));
-        return toResponse(produto);
+        return toDetalheResponse(produto);
     }
 
     public ProdutoResponse atualizar(Integer id, ProdutoRequest request) {
@@ -96,6 +100,25 @@ public class ProdutoService {
         List<String> materiais = produto.getMateriais().stream().map(material -> material.getNome()).collect(Collectors.toList());
         ProdutoResponse produtoResponse = new ProdutoResponse(id, nome, descricao, foto, categoria, materiais);
         return produtoResponse;
+
+    }
+
+    private ProdutoDetalheResponse toDetalheResponse(Produto produto) {
+        Integer id = produto.getId();
+        String nome = produto.getNome();
+        String descricao = produto.getDescricao();
+        String foto = produto.getFoto();
+        String categoria = produto.getCategoria().getNome();
+        List<String> materiais = produto.getMateriais().stream().map(material -> material.getNome()).collect(Collectors.toList());
+        List<VariacaoResponse> variacoes = produto.getVariacoes().stream().
+                map(v -> new VariacaoResponse(v.getId(), v.getCor().getNome(), v.getTamanho(),
+                        v.getPeso(), v.getPreco(), v.getPrazoEmDias(),v.getFoto(),
+                        v.getProduto().getNome())).collect(Collectors.toList());
+
+        ProdutoDetalheResponse produtoDetalheResponse = new ProdutoDetalheResponse(id, nome, descricao, foto, categoria, materiais, variacoes);
+        return produtoDetalheResponse;
+
+
 
     }
 
