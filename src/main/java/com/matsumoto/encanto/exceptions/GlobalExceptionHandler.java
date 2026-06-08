@@ -29,6 +29,12 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(VariacaoNaoEncontradaException.class)
+    public ResponseEntity<Object> handleVariacaoNaoEncontradaException(VariacaoNaoEncontradaException ex) {
+        Map<String, Object> body = criarCorpoResposta(HttpStatus.NOT_FOUND, ex.getMessage());
+        return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+    }
+
     private Map<String, Object> criarCorpoResposta(HttpStatus status, String mensagem) {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now());
