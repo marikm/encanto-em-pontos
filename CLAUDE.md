@@ -52,7 +52,7 @@ chore:    configure [dependency/environment]
 | `Cor` | ✅ | ✅ | ✅ | ✅ GET /api/cores | — | ✅ `CorNaoEncontradaException` |
 | `Categoria` | ✅ | ✅ | ❌ | ⚠️ stub removido, controller vazio | — | ✅ `CategoriaNaoEncontradaException` |
 | `Material` | ✅ | ✅ | ❌ | ❌ | — | ❌ |
-| `Produto` | ✅ | ✅ | ✅ | ✅ POST · PUT · DELETE /api/produtos | ✅ Request/Response | ✅ `ProdutoNaoEncontradoException` |
+| `Produto` | ✅ | ✅ | ✅ | ✅ GET (paginado) · GET /{id} · POST · PUT · DELETE /api/produtos | ✅ Request/Response/DetalheResponse | ✅ `ProdutoNaoEncontradoException` |
 | `Variacao` | ✅ | ✅ | ✅ | ✅ POST · PUT · DELETE /api/variacoes | ✅ Request/Response | ✅ `VariacaoNaoEncontradaException` |
 
 ### GlobalExceptionHandler
@@ -60,12 +60,18 @@ Registrado: `CorNaoEncontradaException` · `ProdutoNaoEncontradoException` · `C
 
 ### ProdutoService — métodos implementados
 - `criar` ✅ — busca Categoria + Materiais, monta Produto com setters, save retorna entidade com ID
-- `listarTodos` ✅ — findAll + stream/map para Response
-- `buscarPorId` ✅ — orElseThrow com ProdutoNaoEncontradoException
+- `listarTodos(Pageable)` ✅ — findAll(pageable) + Page.map para ProdutoResponse
+- `buscarPorId` ✅ — orElseThrow com ProdutoNaoEncontradoException · retorna ProdutoDetalheResponse
 - `atualizar` ✅ — busca produto existente, atualiza campos, save retorna entidade com ID
 - `deletar` ✅ — busca antes de deletar para garantir que existe
+- `toDetalheResponse` ✅ (private) — mapeia Produto → ProdutoDetalheResponse com lista de VariacaoResponse
+
+### ProdutoDetalheResponse — campos
+`id` · `nome` · `descricao` · `foto` · `categoriaNome` · `materiaisNomes` (List<String>) · `variacoes` (List<VariacaoResponse>)
 
 ### ProdutoController — endpoints implementados
+- `GET /api/produtos` → listagem paginada · retorna 200 OK · público
+- `GET /api/produtos/{id}` → detalhe com variações · retorna 200 OK · público
 - `POST /api/produtos` → criar · retorna 201 Created
 - `PUT /api/produtos/{id}` → atualizar · retorna 200 OK
 - `DELETE /api/produtos/{id}` → deletar · retorna 204 No Content
@@ -94,7 +100,7 @@ Registrado: `CorNaoEncontradaException` · `ProdutoNaoEncontradoException` · `C
 |---|---------|--------|
 | F01 | Produto completo | ✅ concluída |
 | F02 | Variação do produto | ✅ concluída |
-| F03 | Catálogo público (GET paginado) | ❌ |
+| F03 | Catálogo público (GET paginado) | ⚠️ implementação concluída · testes pendentes |
 | F04 | Filtro de produtos (Specification) | ❌ |
 | F05 | Upload de imagens — Cloudinary | ❌ |
 
@@ -198,10 +204,9 @@ void acao_condicao_resultadoEsperado() throws Exception {
 
 ## Próximo passo
 
-**F03 · Catálogo público de produtos** — sem autenticação · paginado · detalhe inclui variações
+**F03 · Testes de integração do catálogo público** — endpoints implementados, falta cobrir com testes
 
-Endpoints:
-```
-GET    /api/produtos          → listagem paginada (público)
-GET    /api/produtos/{id}     → detalhe com variações (público)
-```
+Cenários obrigatórios:
+- `GET /api/produtos` → 200 + página com produtos cadastrados
+- `GET /api/produtos/{id}` → 200 + campos do produto + lista de variações
+- `GET /api/produtos/{id}` com ID inválido → 404
