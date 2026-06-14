@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -97,7 +98,11 @@ public class ProdutoService {
         String descricao = produto.getDescricao();
         String foto = produto.getFoto();
         String categoria = produto.getCategoria().getNome();
-        List<String> materiais = produto.getMateriais().stream().map(material -> material.getNome()).collect(Collectors.toList());
+        List<String> materiais = new ArrayList<>();
+        if (produto.getMateriais() != null)  {
+            materiais = produto.getMateriais().stream().map(material -> material.getNome()).collect(Collectors.toList());
+
+        }
         ProdutoResponse produtoResponse = new ProdutoResponse(id, nome, descricao, foto, categoria, materiais);
         return produtoResponse;
 
@@ -109,11 +114,18 @@ public class ProdutoService {
         String descricao = produto.getDescricao();
         String foto = produto.getFoto();
         String categoria = produto.getCategoria().getNome();
-        List<String> materiais = produto.getMateriais().stream().map(material -> material.getNome()).collect(Collectors.toList());
-        List<VariacaoResponse> variacoes = produto.getVariacoes().stream().
-                map(v -> new VariacaoResponse(v.getId(), v.getCor().getNome(), v.getTamanho(),
-                        v.getPeso(), v.getPreco(), v.getPrazoEmDias(),v.getFoto(),
-                        v.getProduto().getNome())).collect(Collectors.toList());
+        List<String> materiais = new ArrayList<>();
+        if (produto.getMateriais() != null)  {
+            materiais = produto.getMateriais().stream().map(material -> material.getNome()).collect(Collectors.toList());
+
+        }
+        List<VariacaoResponse> variacoes = new ArrayList<>();
+        if (produto.getVariacoes() != null) {
+            variacoes = produto.getVariacoes().stream().
+                    map(v -> new VariacaoResponse(v.getId(), v.getCor().getNome(), v.getTamanho(), v.getPeso(), v.getPreco(),
+                            v.getPrazoEmDias(),v.getFoto(), v.getProduto().getNome())).collect(Collectors.toList());
+        }
+
 
         ProdutoDetalheResponse produtoDetalheResponse = new ProdutoDetalheResponse(id, nome, descricao, foto, categoria, materiais, variacoes);
         return produtoDetalheResponse;

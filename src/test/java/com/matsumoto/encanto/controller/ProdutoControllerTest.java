@@ -127,6 +127,40 @@ public class ProdutoControllerTest {
 
     }
 
+    @Test
+    void listarProdutos_comProdutosCadastrados_retorna200ComPagina() throws Exception {
+        Categoria categoria = categoriaRepository.findById(categoriaId).get();
+        Produto produto = new Produto(null, "biquíni rendado", null, null, categoria, null, null);
+        Produto produto2 = new Produto(null, "saída de praia", null, null, categoria, null, null);
+        produtoRepository.save(produto);
+        produtoRepository.save(produto2);
+
+        mockMvc.perform(get("/api/produtos"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].nome").value("biquíni rendado"))
+                .andExpect(jsonPath("$.content[1].nome").value("saída de praia"));
+   }
+
+    @Test
+    void buscarPorId_comIdValido_retorna200ComCamposEProduto() throws Exception {
+        Categoria categoria = categoriaRepository.findById(categoriaId).get();
+        Produto produto = new Produto(null, "biquíni rendado", null, null, categoria, null, null);
+        Produto produtoSalvo = produtoRepository.save(produto);
+        Integer produtoId = produtoSalvo.getId();
+
+
+        mockMvc.perform(get("/api/produtos/" + produtoId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.nome").value("biquíni rendado"))
+                .andExpect(jsonPath("$.categoriaNome").value("Biquíni"))
+                .andExpect(jsonPath("$.variacoes").isArray());
+    }
+
+    @Test
+    void buscarPorId_comIdInvalido_retorna404() throws Exception {
+        mockMvc.perform(get("/api/produtos/999")).andExpect(status().isNotFound());
+    }
+
 
 
 
