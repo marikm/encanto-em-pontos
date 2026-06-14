@@ -54,3 +54,6 @@ buildNumber.properties
 .env
 *.env
 !.env.example
+
+### Docs
+docs/

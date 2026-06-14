@@ -12,7 +12,6 @@ import lombok.*;
 @Table(name = "materiais")
 public class Material {
     @EqualsAndHashCode.Include
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
