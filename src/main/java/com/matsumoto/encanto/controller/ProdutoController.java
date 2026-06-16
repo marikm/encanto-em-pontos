@@ -22,8 +22,14 @@ public class ProdutoController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<ProdutoResponse>> listarTodos(Pageable pageable) {
-        Page<ProdutoResponse> page = produtoService.listarTodos(pageable);
+
+    public ResponseEntity<Page<ProdutoResponse>> listar( @RequestParam(required = false) Integer categoriaId,
+                                                         @RequestParam(required = false) String cor,
+                                                         @RequestParam(required = false) Double precoMin,
+                                                         @RequestParam(required = false) Double precoMax,
+                                                         @RequestParam(required = false) String busca,
+                                                         Pageable pageable) {
+        Page<ProdutoResponse> page = produtoService.filtrar(categoriaId, cor, precoMin, precoMax, busca, pageable);
         return new ResponseEntity<>(page, HttpStatus.OK);
     }
 

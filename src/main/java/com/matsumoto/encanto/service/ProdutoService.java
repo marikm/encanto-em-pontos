@@ -13,8 +13,10 @@ import com.matsumoto.encanto.exceptions.ProdutoNaoEncontradoException;
 import com.matsumoto.encanto.repository.CategoriaRepository;
 import com.matsumoto.encanto.repository.MaterialRepository;
 import com.matsumoto.encanto.repository.ProdutoRepository;
+import com.matsumoto.encanto.specification.ProdutoSpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -129,8 +131,30 @@ public class ProdutoService {
 
         ProdutoDetalheResponse produtoDetalheResponse = new ProdutoDetalheResponse(id, nome, descricao, foto, categoria, materiais, variacoes);
         return produtoDetalheResponse;
+    }
 
+    public Page<ProdutoResponse> filtrar (Integer categoriaId, String cor, Double precoMin,
+                                          Double precoMax, String busca, Pageable pageable) {
+        Specification<Produto> spec = Specification.where((Specification<Produto>) null);
+        if (categoriaId != null) {
+            spec = spec.and(ProdutoSpecification.porCategoria(categoriaId));
+        }
 
+        if (cor != null && !cor.isBlank()) {
+            spec = spec.and(ProdutoSpecification.porCor(cor));
+        }
+
+        if(precoMin != null) {
+            spec = spec.and(ProdutoSpecification.precoMinimo(precoMin));
+        }
+        if (precoMax != null) {
+            spec = spec.and(ProdutoSpecification.precoMaximo(precoMax));
+        }
+        if (busca != null && !busca.isBlank()){
+            spec = spec.and(ProdutoSpecification.porBusca(busca));
+        }
+
+        return produtoRepository.findAll(spec, pageable).map(this::toResponse);
 
     }
 
