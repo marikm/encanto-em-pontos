@@ -73,47 +73,66 @@ public class ProdutoFiltroControllerTest {
     void listar_semFiltros_retornaTodosOsProdutos() throws Exception {
         mockMvc.perform(get("/api/produtos"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content[0].nome").value("biquini rendado"));
+                .andExpect(jsonPath("$.content.length()").value(2));
     }
 
     @Test
     void listar_comFiltroCategoria_retornaApenasOsProdutosDaCategoria() throws Exception {
         mockMvc.perform(get("/api/produtos").param("categoriaId", categoriaSalva.getId().toString()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content.length()").value(1));
+                .andExpect(jsonPath("$.content.length()").value(1))
+                .andExpect(jsonPath("$.content[0].nome").value("biquini rendado"));
     }
 
     @Test
     void listar_comFiltroCor_retornaApenasOsProdutosComVariacaoNaCor() throws Exception {
-        Cor corSalva = corRepository.save(new Cor(null, "azul"));
-        criarVariacao(produtoSalvo, corSalva, 50.0);
+        Cor corSalva = corRepository.save(new Cor(null, "Rosa"));
+        criarVariacao(produtoSalvo, corSalva, 100.0);
 
-        mockMvc.perform(get("/api/produtos").param("cor", corSalva.getNome()))
+        mockMvc.perform(get("/api/produtos").param("cor", "Rosa"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content.length()").value(1));
+                .andExpect(jsonPath("$.content.length()").value(1))
+                .andExpect(jsonPath("$.content[0].nome").value("biquini rendado"));
     }
 
     @Test
     void listar_comFiltroFaixaDePreco_retornaApenasOsProdutosDentroDoIntervalo() throws Exception {
-        Cor corSalva = corRepository.save(new Cor(null, "azul"));
-        criarVariacao(produtoSalvo, corSalva, 50.0);
-        criarVariacao(produtoSalvo2, corSalva, 70.0);
+        Cor corSalva = corRepository.save(new Cor(null, "Rosa"));
+        criarVariacao(produtoSalvo, corSalva, 100.0);
+        criarVariacao(produtoSalvo2, corSalva, 300.0);
 
-        mockMvc.perform(get("/api/produtos").param("precoMin", "30.0"))
+        mockMvc.perform(get("/api/produtos")
+                        .param("precoMin", "50.0")
+                        .param("precoMax", "200.0"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content.length()").value(2));
-
-        mockMvc.perform(get("/api/produtos").param("precoMax", "60.0"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content.length()").value(1));
+                .andExpect(jsonPath("$.content.length()").value(1))
+                .andExpect(jsonPath("$.content[0].nome").value("biquini rendado"));
     }
 
     @Test
     void listar_comFiltroBusca_retornaApenasOsProdutosComNomeCorrespondente() throws Exception {
-        mockMvc.perform(get("/api/produtos").param("busca", "rendado"))
+        mockMvc.perform(get("/api/produtos").param("busca", "biquini"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content[0].nome").value("biquini rendado"))
-                .andExpect(jsonPath("$.content.length()").value(1));
+                .andExpect(jsonPath("$.content.length()").value(1))
+                .andExpect(jsonPath("$.content[0].nome").value("biquini rendado"));
+    }
+
+    @Test
+    void listar_comTodosOsFiltrosCombinados_retornaResultadoCorreto() throws Exception {
+        Cor rosa = corRepository.save(new Cor(null, "Rosa"));
+        Cor azul = corRepository.save(new Cor(null, "Azul"));
+        criarVariacao(produtoSalvo, rosa, 100.0);
+        criarVariacao(produtoSalvo2, azul, 300.0);
+
+        mockMvc.perform(get("/api/produtos")
+                        .param("categoriaId", categoriaSalva.getId().toString())
+                        .param("cor", "Rosa")
+                        .param("precoMin", "50.0")
+                        .param("precoMax", "200.0")
+                        .param("busca", "biquini"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.length()").value(1))
+                .andExpect(jsonPath("$.content[0].nome").value("biquini rendado"));
     }
 
     @Test
