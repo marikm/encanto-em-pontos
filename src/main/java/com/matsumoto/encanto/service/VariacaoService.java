@@ -3,7 +3,6 @@ package com.matsumoto.encanto.service;
 import com.matsumoto.encanto.domain.Cor;
 import com.matsumoto.encanto.domain.Produto;
 import com.matsumoto.encanto.domain.Variacao;
-import com.matsumoto.encanto.dto.ProdutoResponse;
 import com.matsumoto.encanto.dto.VariacaoRequest;
 import com.matsumoto.encanto.dto.VariacaoResponse;
 import com.matsumoto.encanto.exceptions.CorNaoEncontradaException;
@@ -87,8 +86,7 @@ public class VariacaoService {
         String foto = variacao.getFoto();
         String nomeProduto = variacao.getProduto().getNome();
 
-        VariacaoResponse variacaoResponse = new VariacaoResponse(id, cor, tamanho, peso, preco, prazoEmDias, foto, nomeProduto );
-        return variacaoResponse;
+        return new VariacaoResponse(id, cor, tamanho, peso, preco, prazoEmDias, foto, nomeProduto );
     }
 
 }
