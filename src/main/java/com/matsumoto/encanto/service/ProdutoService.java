@@ -135,7 +135,7 @@ public class ProdutoService {
 
     public Page<ProdutoResponse> filtrar (Integer categoriaId, String cor, Double precoMin,
                                           Double precoMax, String busca, Pageable pageable) {
-        Specification<Produto> spec = Specification.where((Specification<Produto>) null);
+        Specification<Produto> spec = (root, query, cb) -> cb.conjunction();
         if (categoriaId != null) {
             spec = spec.and(ProdutoSpecification.porCategoria(categoriaId));
         }
