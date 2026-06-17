@@ -3,7 +3,6 @@ package com.matsumoto.encanto.service;
 import com.matsumoto.encanto.domain.Categoria;
 import com.matsumoto.encanto.domain.Material;
 import com.matsumoto.encanto.domain.Produto;
-import com.matsumoto.encanto.domain.Variacao;
 import com.matsumoto.encanto.dto.ProdutoDetalheResponse;
 import com.matsumoto.encanto.dto.ProdutoRequest;
 import com.matsumoto.encanto.dto.ProdutoResponse;
@@ -110,11 +109,10 @@ public class ProdutoService {
         String categoria = produto.getCategoria().getNome();
         List<String> materiais = new ArrayList<>();
         if (produto.getMateriais() != null)  {
-            materiais = produto.getMateriais().stream().map(material -> material.getNome()).collect(Collectors.toList());
+            materiais = produto.getMateriais().stream().map(Material::getNome).collect(Collectors.toList());
 
         }
-        ProdutoResponse produtoResponse = new ProdutoResponse(id, nome, descricao, foto, categoria, materiais);
-        return produtoResponse;
+        return new ProdutoResponse(id, nome, descricao, foto, categoria, materiais);
     }
 
     private ProdutoDetalheResponse toDetalheResponse(Produto produto) {
@@ -125,7 +123,7 @@ public class ProdutoService {
         String categoria = produto.getCategoria().getNome();
         List<String> materiais = new ArrayList<>();
         if (produto.getMateriais() != null)  {
-            materiais = produto.getMateriais().stream().map(material -> material.getNome()).collect(Collectors.toList());
+            materiais = produto.getMateriais().stream().map(Material::getNome).collect(Collectors.toList());
 
         }
         List<VariacaoResponse> variacoes = new ArrayList<>();
@@ -136,8 +134,7 @@ public class ProdutoService {
         }
 
 
-        ProdutoDetalheResponse produtoDetalheResponse = new ProdutoDetalheResponse(id, nome, descricao, foto, categoria, materiais, variacoes);
-        return produtoDetalheResponse;
+        return new ProdutoDetalheResponse(id, nome, descricao, foto, categoria, materiais, variacoes);
     }
 
     public Page<ProdutoResponse> filtrar (Integer categoriaId, String cor, Double precoMin,
