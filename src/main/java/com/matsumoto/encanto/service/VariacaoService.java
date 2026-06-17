@@ -3,6 +3,7 @@ package com.matsumoto.encanto.service;
 import com.matsumoto.encanto.domain.Cor;
 import com.matsumoto.encanto.domain.Produto;
 import com.matsumoto.encanto.domain.Variacao;
+import com.matsumoto.encanto.dto.ProdutoResponse;
 import com.matsumoto.encanto.dto.VariacaoRequest;
 import com.matsumoto.encanto.dto.VariacaoResponse;
 import com.matsumoto.encanto.exceptions.CorNaoEncontradaException;
@@ -66,6 +67,14 @@ public class VariacaoService {
         Variacao variacao = variacaoRepository.findById(id)
                 .orElseThrow(() -> new VariacaoNaoEncontradaException("Variação não encontrada! O ID " + id + " não existe no catálogo do ateliê."));
         variacaoRepository.delete(variacao);
+    }
+
+    public VariacaoResponse atualizarFoto(Integer id, String url) {
+        Variacao variacao = variacaoRepository.findById(id)
+                .orElseThrow(() -> new VariacaoNaoEncontradaException("Variação não encontrada! O ID " + id + " não existe no catálogo do ateliê."));
+        variacao.setFoto(url);
+        Variacao variacaoSalva = variacaoRepository.save(variacao);
+        return toResponse(variacaoSalva);
     }
 
     private VariacaoResponse toResponse(Variacao variacao) {
