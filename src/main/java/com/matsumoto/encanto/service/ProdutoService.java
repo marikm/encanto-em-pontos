@@ -94,6 +94,14 @@ public class ProdutoService {
         produtoRepository.delete(produto);
     }
 
+    public ProdutoResponse atualizarFoto(Integer id, String url) {
+        Produto produto = produtoRepository.findById(id)
+                .orElseThrow(() -> new ProdutoNaoEncontradoException("Produto não encontrado! O ID " + id + " não existe no catálogo do ateliê."));
+        produto.setFoto(url);
+        Produto produtoSalvo = produtoRepository.save(produto);
+        return toResponse(produtoSalvo);
+    }
+
     private ProdutoResponse toResponse(Produto produto) {
         Integer id = produto.getId();
         String nome = produto.getNome();
@@ -107,7 +115,6 @@ public class ProdutoService {
         }
         ProdutoResponse produtoResponse = new ProdutoResponse(id, nome, descricao, foto, categoria, materiais);
         return produtoResponse;
-
     }
 
     private ProdutoDetalheResponse toDetalheResponse(Produto produto) {
