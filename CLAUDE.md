@@ -64,7 +64,18 @@ Registrado: `CorNaoEncontradaException` · `ProdutoNaoEncontradoException` · `C
 - `buscarPorId` ✅ — orElseThrow com ProdutoNaoEncontradoException · retorna ProdutoDetalheResponse
 - `atualizar` ✅ — busca produto existente, atualiza campos, save retorna entidade com ID
 - `deletar` ✅ — busca antes de deletar para garantir que existe
-- `toDetalheResponse` ✅ (private) — mapeia Produto → ProdutoDetalheResponse com lista de VariacaoResponse
+- `toDetalheResponse` ✅ (private) — mapeia Produto → ProdutoDetalheResponse com lista de VariacaoResponse · null-safe para materiais e variacoes
+- `filtrar` ❌ — pendente · receberá categoriaId, cor, precoMin, precoMax, busca + Pageable · usa Specification
+
+### ProdutoSpecification — filtros implementados (F04)
+- `porCategoria(Integer categoriaId)` ✅ — join categoria · cb.equal por id
+- `porCor(String cor)` ✅ — join variacoes → join cor · cb.equal por nome
+- `precoMinimo(Double precoMin)` ✅ — join variacoes · cb.greaterThanOrEqualTo
+- `precoMaximo(Double precoMax)` ✅ — join variacoes · cb.lessThanOrEqualTo
+- `porBusca(String busca)` ✅ — cb.like no nome do produto
+
+### ProdutoRepository — interfaces estendidas
+`JpaRepository<Produto, Integer>` · `JpaSpecificationExecutor<Produto>`
 
 ### ProdutoDetalheResponse — campos
 `id` · `nome` · `descricao` · `foto` · `categoriaNome` · `materiaisNomes` (List<String>) · `variacoes` (List<VariacaoResponse>)
@@ -100,8 +111,8 @@ Registrado: `CorNaoEncontradaException` · `ProdutoNaoEncontradoException` · `C
 |---|---------|--------|
 | F01 | Produto completo | ✅ concluída |
 | F02 | Variação do produto | ✅ concluída |
-| F03 | Catálogo público (GET paginado) | ⚠️ implementação concluída · testes pendentes |
-| F04 | Filtro de produtos (Specification) | ❌ |
+| F03 | Catálogo público (GET paginado) | ✅ concluída |
+| F04 | Filtro de produtos (Specification) | ⚠️ em andamento · ProdutoSpecification + ProdutoRepository concluídos |
 | F05 | Upload de imagens — Cloudinary | ❌ |
 
 ### FASE 2 — Autenticação (iniciar após F05)
@@ -204,9 +215,13 @@ void acao_condicao_resultadoEsperado() throws Exception {
 
 ## Próximo passo
 
-**F03 · Testes de integração do catálogo público** — endpoints implementados, falta cobrir com testes
+**F04 · Filtro de produtos (Specification)** — em andamento na branch `feature/f04-filtro-produtos`
 
-Cenários obrigatórios:
-- `GET /api/produtos` → 200 + página com produtos cadastrados
-- `GET /api/produtos/{id}` → 200 + campos do produto + lista de variações
-- `GET /api/produtos/{id}` com ID inválido → 404
+Concluído:
+- `ProdutoSpecification` com 5 filtros: porCategoria, porCor, precoMinimo, precoMaximo, porBusca
+- `ProdutoRepository` estende `JpaSpecificationExecutor<Produto>`
+
+Pendente:
+- `ProdutoService.filtrar` — combinar Specifications com `.and()` e chamar `findAll(spec, pageable)`
+- `ProdutoController` — novo endpoint `GET /api/produtos` com `@RequestParam(required = false)` para cada filtro
+- Testes de integração
