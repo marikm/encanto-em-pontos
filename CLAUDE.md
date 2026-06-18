@@ -4,7 +4,7 @@ E-commerce de peças de crochê artesanal sob encomenda.
 
 ## Stack
 
-- Java 21 · Spring Boot 3 · Spring Data JPA
+- Java 21 · Spring Boot 4 · Spring Data JPA
 - PostgreSQL (produção) · H2 (perfil `test`)
 - Cloudinary (upload de imagens — F05)
 - Lombok · Bean Validation · GlobalExceptionHandler
@@ -65,7 +65,8 @@ Registrado: `CorNaoEncontradaException` · `ProdutoNaoEncontradoException` · `C
 - `atualizar` ✅ — busca produto existente, atualiza campos, save retorna entidade com ID
 - `deletar` ✅ — busca antes de deletar para garantir que existe
 - `toDetalheResponse` ✅ (private) — mapeia Produto → ProdutoDetalheResponse com lista de VariacaoResponse · null-safe para materiais e variacoes
-- `filtrar` ❌ — pendente · receberá categoriaId, cor, precoMin, precoMax, busca + Pageable · usa Specification
+- `filtrar` ✅ — combina Specifications com `.and()` e chama `findAll(spec, pageable)`
+- `atualizarFoto` ✅ — busca produto, seta URL da foto, salva e retorna ProdutoResponse
 
 ### ProdutoSpecification — filtros implementados (F04)
 - `porCategoria(Integer categoriaId)` ✅ — join categoria · cb.equal por id
@@ -91,11 +92,19 @@ Registrado: `CorNaoEncontradaException` · `ProdutoNaoEncontradoException` · `C
 - `criar` ✅ — busca Produto + Cor, monta Variacao com setters, save retorna entidade com ID
 - `atualizar` ✅ — busca variação existente, busca Cor por corId, atualiza campos
 - `deletar` ✅ — busca antes de deletar para garantir que existe
+- `atualizarFoto` ✅ — busca variação, seta URL da foto, salva e retorna VariacaoResponse
 
 ### VariacaoController — endpoints implementados
 - `POST /api/produtos/{id}/variacoes` → criar · retorna 201 Created
 - `PUT /api/variacoes/{id}` → atualizar · retorna 200 OK
 - `DELETE /api/variacoes/{id}` → deletar · retorna 204 No Content
+
+### ImagemController — endpoints implementados (F05)
+- `POST /api/produtos/{id}/foto` → upload foto do produto · retorna 200 OK com ProdutoResponse
+- `POST /api/variacoes/{id}/foto` → upload foto da variação · retorna 200 OK com VariacaoResponse
+
+### CloudinaryService
+- `upload(MultipartFile)` ✅ — envia arquivo ao Cloudinary, aplica transformação eager 600×600, retorna URL pública
 
 ### Variacao — observações de domínio
 - `cor` é FK para a entidade `Cor` (`@ManyToOne`) — não texto livre
@@ -112,8 +121,8 @@ Registrado: `CorNaoEncontradaException` · `ProdutoNaoEncontradoException` · `C
 | F01 | Produto completo | ✅ concluída |
 | F02 | Variação do produto | ✅ concluída |
 | F03 | Catálogo público (GET paginado) | ✅ concluída |
-| F04 | Filtro de produtos (Specification) | ⚠️ em andamento · ProdutoSpecification + ProdutoRepository concluídos |
-| F05 | Upload de imagens — Cloudinary | ❌ |
+| F04 | Filtro de produtos (Specification) | ✅ concluída |
+| F05 | Upload de imagens — Cloudinary | ✅ concluída |
 
 ### FASE 2 — Autenticação (iniciar após F05)
 | # | Feature | Status |
@@ -211,17 +220,15 @@ void acao_condicao_resultadoEsperado() throws Exception {
 - Recurso não encontrado: ID inválido → 404
 - Validação: campo obrigatório ausente → 400
 
+### Mockando serviços externos nos testes (F05)
+Quando o controller depende de um serviço externo (ex: Cloudinary), usar `@MockitoBean` no campo da classe de teste.
+Import: `org.springframework.test.context.bean.override.mockito.MockitoBean`
+Requer `mockito-core` no `pom.xml` com `scope test` (não vem junto nos starters modulares do Spring Boot 4).
+Programar o comportamento com `when(mock.metodo(any())).thenReturn(valor)` antes da chamada ao MockMvc.
+
 ---
 
 ## Próximo passo
 
-**F04 · Filtro de produtos (Specification)** — em andamento na branch `feature/f04-filtro-produtos`
-
-Concluído:
-- `ProdutoSpecification` com 5 filtros: porCategoria, porCor, precoMinimo, precoMaximo, porBusca
-- `ProdutoRepository` estende `JpaSpecificationExecutor<Produto>`
-
-Pendente:
-- `ProdutoService.filtrar` — combinar Specifications com `.and()` e chamar `findAll(spec, pageable)`
-- `ProdutoController` — novo endpoint `GET /api/produtos` com `@RequestParam(required = false)` para cada filtro
-- Testes de integração
+**F06 · Entidade Pessoa + Endereço** — FASE 2 — Autenticação
+Branch a criar: `feature/f06-entidade-pessoa-endereco` a partir de `develop`
