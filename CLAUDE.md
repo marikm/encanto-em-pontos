@@ -7,6 +7,7 @@ E-commerce de peças de crochê artesanal sob encomenda.
 - Java 21 · Spring Boot 4 · Spring Data JPA
 - PostgreSQL (produção) · H2 (perfil `test`)
 - Cloudinary (upload de imagens — F05)
+- Spring Security · BCrypt (autenticação — F06+)
 - Lombok · Bean Validation · GlobalExceptionHandler
 
 **Package base:** `com.matsumoto.encanto`  
@@ -54,9 +55,11 @@ chore:    configure [dependency/environment]
 | `Material` | ✅ | ✅ | ❌ | ❌ | — | ❌ |
 | `Produto` | ✅ | ✅ | ✅ | ✅ GET (paginado) · GET /{id} · POST · PUT · DELETE /api/produtos | ✅ Request/Response/DetalheResponse | ✅ `ProdutoNaoEncontradoException` |
 | `Variacao` | ✅ | ✅ | ✅ | ✅ POST · PUT · DELETE /api/variacoes | ✅ Request/Response | ✅ `VariacaoNaoEncontradaException` |
+| `Pessoa` | ✅ | ✅ | ✅ | ✅ POST · GET /{id} · PUT /api/clientes | ✅ Request/Response | ✅ `PessoaNaoEncontradaException` · `CpfJaCadastradoException` |
+| `Endereco` | ✅ | ✅ | ✅ | 🔄 em andamento /api/clientes/{id}/enderecos | ✅ Request/Response | ✅ `EnderecoNaoEncontradoException` |
 
 ### GlobalExceptionHandler
-Registrado: `CorNaoEncontradaException` · `ProdutoNaoEncontradoException` · `CategoriaNaoEncontradaException` · `VariacaoNaoEncontradaException`
+Registrado: `CorNaoEncontradaException` · `ProdutoNaoEncontradoException` · `CategoriaNaoEncontradaException` · `VariacaoNaoEncontradaException` · `PessoaNaoEncontradaException` · `EnderecoNaoEncontradoException` · `CpfJaCadastradoException` (409 Conflict)
 
 ### ProdutoService — métodos implementados
 - `criar` ✅ — busca Categoria + Materiais, monta Produto com setters, save retorna entidade com ID
@@ -99,6 +102,38 @@ Registrado: `CorNaoEncontradaException` · `ProdutoNaoEncontradoException` · `C
 - `PUT /api/variacoes/{id}` → atualizar · retorna 200 OK
 - `DELETE /api/variacoes/{id}` → deletar · retorna 204 No Content
 
+### SecurityConfig (F06)
+- `passwordEncoder()` ✅ — `@Bean` de `BCryptPasswordEncoder`
+- `filterChain()` ✅ — desabilita CSRF e libera todos os endpoints temporariamente até o F07 configurar o JWT
+
+### PessoaService — métodos implementados (F06)
+- `cadastrar` ✅ — verifica CPF único via `existsByCpf`, monta `Pessoa`, hasheia senha com `BCryptPasswordEncoder`, salva
+- `buscarPorId` ✅ — `findById` + `orElseThrow` com `PessoaNaoEncontradaException`
+- `atualizar` ✅ — busca existente, atualiza campos incluindo re-hash da senha, salva
+- `toResponse` ✅ (private) — mapeia `Pessoa` → `PessoaResponse` sem expor o campo `senha`
+
+### EnderecoService — métodos implementados (F06)
+- `adicionar` ✅ — busca `Pessoa` por id, monta `Endereco`, seta relacionamento, salva
+- `listarPorPessoa` ✅ — `findByPessoaId` + stream map para `EnderecoResponse`
+- `remover` ✅ — busca endereço ou lança `EnderecoNaoEncontradoException`, deleta
+- `toResponse` ✅ (private) — mapeia `Endereco` → `EnderecoResponse` com `pessoaNome`
+
+### PessoaController — endpoints implementados (F06)
+- `POST /api/clientes` → cadastrar · retorna 201 Created
+- `GET /api/clientes/{id}` → buscar por id · retorna 200 OK
+- `PUT /api/clientes/{id}` → atualizar · retorna 200 OK
+
+### EnderecoController — endpoints implementados (F06)
+- `POST /api/clientes/{pessoaId}/enderecos` → adicionar endereço · retorna 201 Created
+- `GET /api/clientes/{pessoaId}/enderecos` → listar endereços da pessoa · retorna 200 OK
+- `DELETE /api/clientes/{pessoaId}/enderecos/{enderecoId}` → remover · retorna 204 No Content
+
+### Pessoa — observações de domínio (F06)
+- `perfilAcesso` é enum `PerfilAcesso` (`CLIENTE`/`ADMIN`) persistido com `@Enumerated(EnumType.STRING)`
+- `cpf` e `email` têm `@Column(unique = true)` — unicidade garantida no banco
+- `senha` nunca é exposta no `PessoaResponse` — hash aplicado no Service com BCrypt
+- `CpfJaCadastradoException` lança 409 Conflict (não 404) quando CPF já existe
+
 ### ImagemController — endpoints implementados (F05)
 - `POST /api/produtos/{id}/foto` → upload foto do produto · retorna 200 OK com ProdutoResponse
 - `POST /api/variacoes/{id}/foto` → upload foto da variação · retorna 200 OK com VariacaoResponse
@@ -127,7 +162,7 @@ Registrado: `CorNaoEncontradaException` · `ProdutoNaoEncontradoException` · `C
 ### FASE 2 — Autenticação (iniciar após F05)
 | # | Feature | Status |
 |---|---------|--------|
-| F06 | Entidade Pessoa + Endereço | ❌ |
+| F06 | Entidade Pessoa + Endereço | 🔄 implementação concluída · testes pendentes |
 | F07 | Login com JWT | ❌ |
 
 ### FASE 3 — Pedido (iniciar após F07)
@@ -230,5 +265,6 @@ Programar o comportamento com `when(mock.metodo(any())).thenReturn(valor)` antes
 
 ## Próximo passo
 
-**F06 · Entidade Pessoa + Endereço** — FASE 2 — Autenticação
-Branch a criar: `feature/f06-entidade-pessoa-endereco` a partir de `develop`
+**Concluir F06** — implementar `EnderecoController` · rodar testes de integração · abrir PR para `develop`
+**Depois: F07 · Login com JWT** — FASE 2 — Autenticação
+Branch a criar: `feature/f07-login-jwt` a partir de `develop`

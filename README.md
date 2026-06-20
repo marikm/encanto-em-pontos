@@ -170,12 +170,13 @@ encanto/
 
 | Funcionalidade | Status | Branch |
 |---------------|--------|--------|
-| Entidade `Categoria` | 🚧 Em desenvolvimento | `main` |
+| Entidade `Categoria` | ✅ Concluído | `main` |
 | Entidade `Cor` | ✅ Concluído | `main` |
 | Entidade `Material` | ✅ Concluído | `main` |
-| Entidade `Produto` | 🚧 Em desenvolvimento | `main` |
-| Entidade `Variacao` | 🚧 Em desenvolvimento | `main` |
-| Entidade `Cliente` | ⏳ Aguardando | — |
+| Entidade `Produto` | ✅ Concluído | `main` |
+| Entidade `Variacao` | ✅ Concluído | `main` |
+| Entidade `Pessoa` + enum `PerfilAcesso` | ✅ Concluído | `feature/f06-pessoa-endereco` |
+| Entidade `Endereco` | ✅ Concluído | `feature/f06-pessoa-endereco` |
 | Entidade `Pedido` | ⏳ Aguardando | — |
 | Entidade `ItemPedido` | ⏳ Aguardando | — |
 | Entidade `Pagamento` | ⏳ Aguardando | — |
@@ -184,19 +185,26 @@ encanto/
 
 | Método | Rota | Descrição | Status |
 |--------|------|-----------|--------|
-| `GET` | `/categorias` | Listar todas as categorias | 🚧 Em desenvolvimento |
 | `GET` | `/api/cores` | Listar todas as cores | ✅ Concluído |
-| `GET` | `/api/cores/{id}` | Buscar cor por ID | ✅ Concluído |
-| `POST` | `/categorias` | Cadastrar categoria | ⏳ Aguardando |
-| `GET` | `/produtos` | Listar catálogo | ⏳ Aguardando |
-| `GET` | `/produtos/{id}` | Detalhar produto | ⏳ Aguardando |
-| `POST` | `/produtos` | Cadastrar produto | ⏳ Aguardando |
-| `GET` | `/materiais` | Listar materiais | ⏳ Aguardando |
-| `POST` | `/pedidos` | Confirmar pedido | ⏳ Aguardando |
-| `GET` | `/pedidos/{id}` | Visualizar pedido | ⏳ Aguardando |
-| `POST` | `/auth/login` | Autenticar usuário | ⏳ Aguardando |
-| `POST` | `/auth/registro` | Cadastrar cliente | ⏳ Aguardando |
-| `POST` | `/pagamentos` | Efetuar pagamento | ⏳ Aguardando |
+| `GET` | `/api/produtos` | Listar catálogo paginado | ✅ Concluído |
+| `GET` | `/api/produtos/{id}` | Detalhar produto com variações | ✅ Concluído |
+| `POST` | `/api/produtos` | Cadastrar produto | ✅ Concluído |
+| `PUT` | `/api/produtos/{id}` | Atualizar produto | ✅ Concluído |
+| `DELETE` | `/api/produtos/{id}` | Remover produto | ✅ Concluído |
+| `POST` | `/api/produtos/{id}/variacoes` | Adicionar variação | ✅ Concluído |
+| `PUT` | `/api/variacoes/{id}` | Atualizar variação | ✅ Concluído |
+| `DELETE` | `/api/variacoes/{id}` | Remover variação | ✅ Concluído |
+| `POST` | `/api/produtos/{id}/foto` | Upload foto do produto | ✅ Concluído |
+| `POST` | `/api/variacoes/{id}/foto` | Upload foto da variação | ✅ Concluído |
+| `POST` | `/api/clientes` | Cadastrar cliente | ✅ Concluído |
+| `GET` | `/api/clientes/{id}` | Buscar cliente por ID | ✅ Concluído |
+| `PUT` | `/api/clientes/{id}` | Atualizar cliente | ✅ Concluído |
+| `POST` | `/api/clientes/{id}/enderecos` | Adicionar endereço | 🔄 Em andamento |
+| `GET` | `/api/clientes/{id}/enderecos` | Listar endereços do cliente | 🔄 Em andamento |
+| `DELETE` | `/api/clientes/{id}/enderecos/{endId}` | Remover endereço | 🔄 Em andamento |
+| `POST` | `/api/auth/login` | Autenticar usuário com JWT | ⏳ Aguardando |
+| `POST` | `/api/pedidos` | Criar carrinho | ⏳ Aguardando |
+| `POST` | `/api/pagamentos` | Efetuar pagamento | ⏳ Aguardando |
 
 ### Infraestrutura
 
@@ -205,7 +213,10 @@ encanto/
 | Conexão com banco de dados (prod e teste) | ✅ Concluído | `main` |
 | Variáveis de ambiente configuradas | ✅ Concluído | `main` |
 | GlobalExceptionHandler | ✅ Concluído | `main` |
-| Autenticação com Spring Security | ⏳ Aguardando | — |
+| Filtros com Spring Data Specification | ✅ Concluído | `main` |
+| Upload de imagens — Cloudinary | ✅ Concluído | `main` |
+| Spring Security + BCrypt | ✅ Concluído | `feature/f06-pessoa-endereco` |
+| Autenticação com JWT | ⏳ Aguardando | — |
 | Docker Compose (PostgreSQL) | ✅ Concluído | `main` |
 
 ---
