@@ -26,8 +26,8 @@ public class Pessoa {
 
     @Column(unique = true)
     @NotBlank
-    private String cpf
-            ;
+    private String cpf;
+
     @Column(unique = true)
     @NotBlank
     private String email;
