@@ -35,6 +35,24 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(PessoaNaoEncontradaException.class)
+    public ResponseEntity<Object> handlePessoaNaoEncontradaException(PessoaNaoEncontradaException ex) {
+        Map<String, Object> body = criarCorpoResposta(HttpStatus.NOT_FOUND, ex.getMessage());
+        return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(EnderecoNaoEncontradoException.class)
+    public ResponseEntity<Object> handleEnderecoNaoEncontrado(EnderecoNaoEncontradoException ex) {
+        Map<String, Object> body = criarCorpoResposta(HttpStatus.NOT_FOUND, ex.getMessage());
+        return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(CpfJaCadastradoException.class)
+    public ResponseEntity<Object> handleCpfJaCadastrado(CpfJaCadastradoException ex) {
+        Map<String, Object> body = criarCorpoResposta(HttpStatus.CONFLICT, ex.getMessage());
+        return new ResponseEntity<>(body, HttpStatus.CONFLICT);
+    }
+
     private Map<String, Object> criarCorpoResposta(HttpStatus status, String mensagem) {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now());

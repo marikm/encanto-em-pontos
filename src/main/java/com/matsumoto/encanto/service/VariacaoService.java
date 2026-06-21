@@ -68,6 +68,14 @@ public class VariacaoService {
         variacaoRepository.delete(variacao);
     }
 
+    public VariacaoResponse atualizarFoto(Integer id, String url) {
+        Variacao variacao = variacaoRepository.findById(id)
+                .orElseThrow(() -> new VariacaoNaoEncontradaException("Variação não encontrada! O ID " + id + " não existe no catálogo do ateliê."));
+        variacao.setFoto(url);
+        Variacao variacaoSalva = variacaoRepository.save(variacao);
+        return toResponse(variacaoSalva);
+    }
+
     private VariacaoResponse toResponse(Variacao variacao) {
         Integer id = variacao.getId();
         String cor = variacao.getCor().getNome();
@@ -78,8 +86,7 @@ public class VariacaoService {
         String foto = variacao.getFoto();
         String nomeProduto = variacao.getProduto().getNome();
 
-        VariacaoResponse variacaoResponse = new VariacaoResponse(id, cor, tamanho, peso, preco, prazoEmDias, foto, nomeProduto );
-        return variacaoResponse;
+        return new VariacaoResponse(id, cor, tamanho, peso, preco, prazoEmDias, foto, nomeProduto );
     }
 
 }
