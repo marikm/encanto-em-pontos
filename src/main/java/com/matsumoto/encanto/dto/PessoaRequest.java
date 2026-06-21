@@ -26,6 +26,7 @@ public class PessoaRequest {
 
     @NotBlank
     private String senha;
+    @NotNull
     private Date dataNascimento;
     private String celular;
     @NotNull
