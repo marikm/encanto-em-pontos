@@ -7,13 +7,16 @@ import com.matsumoto.encanto.dto.PessoaResponse;
 import com.matsumoto.encanto.exceptions.CpfJaCadastradoException;
 import com.matsumoto.encanto.exceptions.PessoaNaoEncontradaException;
 import com.matsumoto.encanto.repository.PessoaRepository;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 
 @Service
-public class PessoaService {
+public class PessoaService implements UserDetailsService {
     private final PessoaRepository pessoaRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -73,5 +76,11 @@ public class PessoaService {
 
 
 
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return pessoaRepository.findByEmail(username)
+                .orElseThrow(() -> new UsernameNotFoundException("E-mail não encontrado"));
     }
 }
