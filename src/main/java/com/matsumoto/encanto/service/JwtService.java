@@ -3,6 +3,7 @@ package com.matsumoto.encanto.service;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -11,7 +12,8 @@ import java.util.Date;
 
 @Service
 public class JwtService {
-    private static final String SECRET_KEY = "${SECRET_KEY}";
+    @Value("${SECRET_KEY}")
+    private String SECRET_KEY;
     private static final long EXPIRACAO_MS = 86400000; // 24h
 
     public String gerarToken(UserDetails userDetails) {
