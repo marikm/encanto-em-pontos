@@ -144,11 +144,13 @@ encanto/
 ├── src/
 │   ├── main/
 │   │   ├── java/com/matsumoto/encanto/
-│   │   │   ├── config/              # Configurações (ex: seed de dados de teste)
+│   │   │   ├── config/              # Configurações (SecurityConfig, ApplicationConfig, CloudinaryConfig)
 │   │   │   ├── controller/          # Controllers REST
-│   │   │   ├── domain/              # Entidades JPA
+│   │   │   ├── domain/              # Entidades JPA e enums
+│   │   │   ├── dto/                 # DTOs de entrada (Request) e saída (Response)
 │   │   │   ├── exceptions/          # Exceções customizadas e GlobalExceptionHandler
 │   │   │   ├── repository/          # Interfaces JPA Repository
+│   │   │   ├── security/            # Filtros de segurança (JwtAuthFilter)
 │   │   │   ├── service/             # Regras de negócio
 │   │   │   └── EncantoApplication.java
 │   │   └── resources/
@@ -156,7 +158,7 @@ encanto/
 │   │       └── application-test.properties   # Configuração de teste (H2)
 │   └── test/
 │       └── java/com/matsumoto/encanto/
-│           └── EncantoApplicationTests.java
+│           └── controller/          # Testes de integração por controller
 ├── docker-compose.yml               # Serviço PostgreSQL
 ├── pom.xml
 └── README.md
@@ -199,10 +201,13 @@ encanto/
 | `POST` | `/api/clientes` | Cadastrar cliente | ✅ Concluído |
 | `GET` | `/api/clientes/{id}` | Buscar cliente por ID | ✅ Concluído |
 | `PUT` | `/api/clientes/{id}` | Atualizar cliente | ✅ Concluído |
-| `POST` | `/api/clientes/{id}/enderecos` | Adicionar endereço | 🔄 Em andamento |
-| `GET` | `/api/clientes/{id}/enderecos` | Listar endereços do cliente | 🔄 Em andamento |
-| `DELETE` | `/api/clientes/{id}/enderecos/{endId}` | Remover endereço | 🔄 Em andamento |
-| `POST` | `/api/auth/login` | Autenticar usuário com JWT | ⏳ Aguardando |
+| `GET` | `/api/categorias` | Listar todas as categorias | ✅ Concluído |
+| `GET` | `/api/categorias/{id}` | Buscar categoria por ID | ✅ Concluído |
+| `POST` | `/api/categorias` | Cadastrar categoria | ✅ Concluído |
+| `POST` | `/api/clientes/{id}/enderecos` | Adicionar endereço | ✅ Concluído |
+| `GET` | `/api/clientes/{id}/enderecos` | Listar endereços do cliente | ✅ Concluído |
+| `DELETE` | `/api/clientes/{id}/enderecos/{endId}` | Remover endereço | ✅ Concluído |
+| `POST` | `/api/auth/login` | Autenticar usuário com JWT | ✅ Concluído |
 | `POST` | `/api/pedidos` | Criar carrinho | ⏳ Aguardando |
 | `POST` | `/api/pagamentos` | Efetuar pagamento | ⏳ Aguardando |
 
@@ -215,8 +220,8 @@ encanto/
 | GlobalExceptionHandler | ✅ Concluído | `main` |
 | Filtros com Spring Data Specification | ✅ Concluído | `main` |
 | Upload de imagens — Cloudinary | ✅ Concluído | `main` |
-| Spring Security + BCrypt | ✅ Concluído | `feature/f06-pessoa-endereco` |
-| Autenticação com JWT | ⏳ Aguardando | — |
+| Spring Security + BCrypt | ✅ Concluído | `main` |
+| Autenticação com JWT (JwtService + JwtAuthFilter) | ✅ Concluído | `main` |
 | Docker Compose (PostgreSQL) | ✅ Concluído | `main` |
 
 ---
