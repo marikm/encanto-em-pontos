@@ -2,6 +2,7 @@ package com.matsumoto.encanto.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -51,6 +52,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Object> handleCpfJaCadastrado(CpfJaCadastradoException ex) {
         Map<String, Object> body = criarCorpoResposta(HttpStatus.CONFLICT, ex.getMessage());
         return new ResponseEntity<>(body, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<Object> handleBadCredentials(BadCredentialsException ex) {
+        Map<String, Object> body = criarCorpoResposta(HttpStatus.UNAUTHORIZED, "Credenciais inválidas.");
+        return new ResponseEntity<>(body, HttpStatus.UNAUTHORIZED);
     }
 
     private Map<String, Object> criarCorpoResposta(HttpStatus status, String mensagem) {
